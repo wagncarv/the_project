@@ -555,7 +555,7 @@ defmodule Superlogica.Chat.Chat do
 
   defp update_contact(contact, values_list) do
     Stream.zip(@contact_updates, values_list)
-    |> Enum.reduce(contact, fn {key, value} ->
+    |> Enum.reduce(contact, fn {key, value}, contact ->
       Map.put(contact, key, value)
     end)
   end
