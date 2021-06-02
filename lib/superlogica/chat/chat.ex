@@ -456,9 +456,7 @@ defmodule Superlogica.Chat.Chat do
       true ->
         Logger.info(Messages.get_stage(103)["message"], ansi_color: :yellow)
         Logger.info(Messages.get_stage(104)["message"], ansi_color: :yellow)
-  end
-
-
+    end
   end
 
   defp listen_and_answer(contact, _stage, "107") do
