@@ -9,6 +9,7 @@ defmodule Superlogica.Chat.Chat do
   alias Superlogica.Storage.Storage
 
   @fields ["number", "name", "protocol", "message"]
+  @contact_updates ["available_dates", "area_id", "area_name", "chosen_area"]
   @message_patterns [~r/%RANDOM_QUESTION%/, ~r/%NAME%/, ~r/%FIRST_OPTION%/, ~r/%SECOND_OPTION%/, ~r/%THIRD_OPTION%/]
 
   def start_link(_ignored) do
@@ -282,10 +283,7 @@ defmodule Superlogica.Chat.Chat do
     |> elem(0)
     |> Reservations.available_dates(String.to_integer(Enum.at(contact["month_number"], 0)), contact["condominium_id"])
     |> IO.inspect(label: "DATAS DISPONÍVEIS === 20")
-    contact = Map.put(contact, "available_dates", available_dates)
-    contact = Map.put(contact, "area_id", elem(available_areas, 0))
-    contact = Map.put(contact, "area_name", elem(available_areas, 1))
-    contact = Map.put(contact, "chosen_area", message)
+    contact = update_contact(contact, [available_dates, elem(available_areas, 0), elem(available_areas, 1), message])
 
     Logger.info(Messages.get_stage(34)["message"], ansi_color: :yellow)
     #//TODO TRATAR RESPOSTA ERRADA
@@ -552,6 +550,13 @@ defmodule Superlogica.Chat.Chat do
     |> String.pad_leading(10, "0")
     Enum.find(dates,0, fn e ->
       e == message
+    end)
+  end
+
+  defp update_contact(contact, values_list) do
+    Stream.zip(@contact_updates, values_list)
+    |> Enum.reduce(contact, fn {key, value} ->
+      Map.put(contact, key, value)
     end)
   end
 

@@ -96,7 +96,7 @@ defmodule Superlogica.Condominos.Reservations do
 
   def reservation_dates(condominium_id, area_id, status \\ "1") do
     reservation_by_area_id(condominium_id, area_id, status)
-    |> Stream.map(fn e -> Map.get(e, "date") end)
+    |> Stream.map(fn e -> Map.get(e, "date") end) #//TODO mudar nomes das variáveis
     |> Stream.map(fn e -> String.replace(e, ~r/ 00:00:00/, "") end)
     |> Enum.map(fn e -> ChronoUnit.convert(e) end)
   end
@@ -149,6 +149,7 @@ defmodule Superlogica.Condominos.Reservations do
     |> List.flatten()
     |> Enum.filter(fn %{"reservas" => reservation} -> reservation != [] end)
     |> include_area_name()
+    |> Enum.map(fn e -> reduce_reservation_fields(e) end)
   end
 
   defp include_area_name(values) do
@@ -164,12 +165,17 @@ defmodule Superlogica.Condominos.Reservations do
     |> List.flatten()
   end
 
-  defp reduce_reservation
-
   defp include_values(keys, values, element) do
     Stream.zip(keys, values)
     |> Enum.map(fn {key, value} ->
       Map.put(element, key, value)
+    end)
+  end
+
+  defp reduce_reservation_fields(map_value) do
+    keys = Enum.map(@keys_reduce_reservation, fn {key, _value} -> key end)
+    Enum.reduce(@keys_reduce_reservation, %{}, fn {key, new_key}, map ->
+      if(key in keys, do: Map.put(map, new_key, Map.get(map_value, key)))
     end)
   end
 
